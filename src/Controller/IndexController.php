@@ -13,7 +13,7 @@ class IndexController extends AbstractController
     private $entityManager;
 
     /** @var ApiService */
-    private $nasaApiService;
+    private $apiService;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -22,7 +22,7 @@ class IndexController extends AbstractController
     public function __construct(EntityManagerInterface $entityManager, ApiService $apiService)
     {
         $this->entityManager = $entityManager;
-        $this->nasaApiService = $apiService;
+        $this->apiService = $apiService;
     }
 
     /**
@@ -30,7 +30,7 @@ class IndexController extends AbstractController
      */
     public function index()
     {
-        $response = $this->nasaApiService->request();
+        $response = $this->apiService->request();
 
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
