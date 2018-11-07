@@ -9,6 +9,7 @@
         "guzzlehttp/guzzle": "^6.3",
         "sensio/framework-extra-bundle": "^5.1",
         "symfony/asset": "*",
+        "symfony/cache": "*",
         "symfony/console": "*",
         "symfony/event-dispatcher": "*",
         "symfony/expression-language": "*",
@@ -31,7 +32,7 @@
         "sensiolabs/security-checker": "^5.0",
         "symfony/debug-pack": "*",
         "symfony/dotenv": "*",
-        "symfony/maker-bundle": "^1.0",
+        "symfony/maker-bundle": "^1.9",
         "symfony/profiler-pack": "*",
         "symfony/test-pack": "*",
         "symfony/web-server-bundle": "*"

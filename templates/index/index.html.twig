@@ -7,14 +7,24 @@ Nasa fiddle thing
 {% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
 
-<div class="example-wrapper">
-    <h1>APOD picture of the day!</h1>
-    <p>According to the API call, today is {{ response.date }}</p>
-    <img class="rounded mx-auto d-block" src="{{ response.url }}">
-</div>
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <h1>APOD picture of the day!</h1>
+        <p>According to the API call, today is {{ response.date }}</p>
+        <img class="img-fluid" src="{{ response.hdurl }}">
+        <div class="blockquote-footer">{{ response.explanation }}</div>
+    </div>
 {% endblock %}

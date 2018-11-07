@@ -10,8 +10,13 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 class ApiService
 {
-    const API_KEY = 'a9454qYBATkVczyjD9Sn7T8E9PeBSbTpGTPIRcO0';
     const APOD_URI = 'https://api.nasa.gov/planetary/apod';
+    const APOD = 'apod';
+    const NEOW_FEED = 'https://api.nasa.gov/neo/rest/v1/feed?start_date=START_DATE&end_date=END_DATE&api_key=API_KEY';
+    const NEOW = 'neow';
+
+    /** @var string Api Key */
+    private $key;
 
     /** @var ClientInterface */
     private $httpClient;
@@ -19,7 +24,7 @@ class ApiService
     /** @var AdapterInterface */
     private $cacheAdapter;
 
-    public function __construct(AdapterInterface $cacheAdapter)
+    public function __construct(AdapterInterface $cacheAdapter, $key)
     {
         $this->httpClient = new GuzzleClient(
             [
@@ -27,39 +32,43 @@ class ApiService
             ]
         );
         $this->cacheAdapter = $cacheAdapter;
+        $this->key = $key;
     }
 
     /**
+     * @param $api
+     *
      * @return bool|mixed
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function request()
+    public function request($api)
     {
-        $cacheKey = self::constructCacheKey('api');
+        $cacheKey = self::constructCacheKey('apod');
 
         try {
-            $cacheItem = $this->cacheAdapter->getItem($cacheKey);
+            $item = $this->cacheAdapter->getItem($cacheKey);
         } catch (\InvalidArgumentException $e) {
-            return false;
+            echo 'InvalidArgumentException';
         }
 
-        if ($cacheItem->isHit()) {
-            return $cacheItem->get();
+        if ($item->isHit()) {
+            return $item->get();
         }
 
         try {
             $request = $this->httpClient->request(
                 'GET',
-                $this->resolveUriParameters()
+                $this->resolveUriParameters($api)
             );
         } catch (GuzzleException $e) {
-            return false;
+            echo 'GuzzleException';
         }
 
         $decode = json_decode($request->getBody()->getContents());
 
-        $cacheItem->set($decode);
-        $cacheItem->expiresAt(new \DateTime('tomorrow'));
+        $item->set($decode);
+        $item->expiresAt(new \DateTime('tomorrow'));
+        $this->cacheAdapter->save($item);
 
         return $decode;
     }
@@ -67,32 +76,54 @@ class ApiService
     /**
      * @return string
      */
-    private function getKey()
+    private function getApiKey()
     {
-        return self::API_KEY;
+        return $this->key;
     }
 
+    //TODO: Figure out how to resolve parameters for two different API calls
+    //TODO: Two different methods, but how to incorporate in request() method? (switch case is too fugly)
+
     /**
-     * @param null $date
+     * @param string $api
+     * @param array $date
      * @param bool $hd
      *
      * @return string
      */
-    private function resolveUriParameters($date = null, $hd = false)
+    private function resolveUriParameters(string $api, $date = [null], $hd = false): string
     {
-        if ($date === null) {
-            $date = date('Y-m-d');
+        switch ($api) {
+            case self::APOD:
+                if ($date === [null]) {
+                    $date = date('Y-m-d');
+                }
+
+                return $url = sprintf(
+                    '%s?date=%s&hd=%s&api_key=%s',
+                    self::APOD_URI,
+                    $date,
+                    $hd,
+                    $this->getApiKey()
+                );
+                break;
+            case self::NEOW:
+
+                if ($date === [null]) {
+                    $date['start_date'] = '1900-01-01';
+                    $date['end_date'] = (new \DateTime('today'));
+                }
+
+                return $url = sprintf(
+                    '%s?start_date=%s&end_date=%s&api_key=%s',
+                    self::NEOW_FEED,
+                    $date['start_date'],
+                    $date['end_date'],
+                    $this->getApiKey()
+                );
+            default:
+                return $url = 'http://google.com';
         }
-
-        $url = sprintf(
-            '%s?date=%s&hd=%s&api_key=%s',
-            self::APOD_URI,
-            $date,
-            $hd,
-            $this->getKey()
-        );
-
-        return $url;
     }
 
     /**
@@ -102,6 +133,6 @@ class ApiService
      */
     public static function constructCacheKey($api): string
     {
-        return sprintf('ApiCall_%s', md5($api));
+        return sprintf('cacheKey_%s', md5($api));
     }
 }
