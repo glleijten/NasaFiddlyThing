@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\NasaApiService;
+use App\Service\ApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,17 +12,17 @@ class IndexController extends AbstractController
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var NasaApiService */
+    /** @var ApiService */
     private $nasaApiService;
 
     /**
      * @param EntityManagerInterface $entityManager
-     * @param NasaApiService $nasaApiService
+     * @param ApiService $apiService
      */
-    public function __construct(EntityManagerInterface $entityManager, NasaApiService $nasaApiService)
+    public function __construct(EntityManagerInterface $entityManager, ApiService $apiService)
     {
         $this->entityManager = $entityManager;
-        $this->nasaApiService = $nasaApiService;
+        $this->nasaApiService = $apiService;
     }
 
     /**

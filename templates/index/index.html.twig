@@ -15,6 +15,6 @@ Nasa fiddle thing
 <div class="example-wrapper">
     <h1>APOD picture of the day!</h1>
     <p>According to the API call, today is {{ response.date }}</p>
-    <img src="{{ response.url }}">
+    <img class="rounded mx-auto d-block" src="{{ response.url }}">
 </div>
 {% endblock %}
